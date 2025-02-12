@@ -1,5 +1,6 @@
-import { Box } from '@mui/material'
 import type { Metadata } from 'next'
+import { Form } from './form'
+import { Box, Typography } from '@mui/material'
 
 export const metadata: Metadata = {
   description:
@@ -8,5 +9,12 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <Box />
+  return (
+    <Box>
+      <Typography component="h1" variant="h3">
+        AI Writing Assistant
+      </Typography>
+      <Form />
+    </Box>
+  )
 }
