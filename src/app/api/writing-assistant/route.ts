@@ -1,5 +1,5 @@
-import { ScenarioId } from '../..//writing-assistant/data'
 import { generateChecklist } from '../../writing-assistant/ai'
+import type { ScenarioId } from '../../writing-assistant/data'
 
 interface RequestJson {
   scenarioId: ScenarioId
@@ -7,7 +7,7 @@ interface RequestJson {
 }
 
 function getRequest(request: Request): Promise<RequestJson> {
-  return request.json()
+  return request.json() as Promise<RequestJson>
 }
 
 export async function POST(request: Request) {

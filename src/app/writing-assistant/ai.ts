@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { type ScenarioId, SCENARIO_LOOKUP } from './data'
 import { getContent } from '../utils/ai'
+import { SCENARIO_LOOKUP } from './data'
+import type { ScenarioId } from './data'
 
 const checklistItemSchema = z.object({
   content: z.string().describe('The topic of the checklist item'),
@@ -30,9 +31,9 @@ export async function generateChecklist(
   // console.log('User message:', userMessage)
 
   const responseContent = await getContent<Response>({
+    contentSchema,
     systemMessage: SYSTEM_INSTRUCTIONS,
     userMessage,
-    contentSchema: contentSchema,
   })
 
   // console.log('Response:', responseContent)

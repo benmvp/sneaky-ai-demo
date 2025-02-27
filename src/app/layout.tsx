@@ -2,6 +2,7 @@
 
 import MenuIcon from '@mui/icons-material/Menu'
 import EditIcon from '@mui/icons-material/Edit'
+import FactCheckIcon from '@mui/icons-material/FactCheck'
 import NextLink from 'next/link'
 import {
   Box,
@@ -171,6 +172,11 @@ const NAV_ITEMS: NavigationItem[] = [
     Icon: EditIcon,
     href: '/writing-assistant',
     label: 'Writing Assistant',
+  },
+  {
+    Icon: FactCheckIcon,
+    href: '/prefilled-forms',
+    label: 'Pre-filled Forms',
   },
 ]
 

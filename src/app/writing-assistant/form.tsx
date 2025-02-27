@@ -1,12 +1,11 @@
 'use client'
 
+import DoneIcon from '@mui/icons-material/Done'
 import {
-  Box,
   FormControl,
   InputLabel,
   Select,
   Typography,
-  SelectChangeEvent,
   MenuItem,
   Stack,
   TextField,
@@ -15,11 +14,12 @@ import {
   Chip,
   Button,
 } from '@mui/material'
-import DoneIcon from '@mui/icons-material/Done'
+import type { SelectChangeEvent } from '@mui/material'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useEffect, useState } from 'react'
-import { type ScenarioId, SCENARIOS, SCENARIO_LOOKUP } from './data'
-import { Checklist } from './ai'
+import type { Checklist } from './ai'
+import { SCENARIOS, SCENARIO_LOOKUP } from './data'
+import type { ScenarioId } from './data'
 
 export function Form() {
   const [scenarioId, setScenarioId] = useState<ScenarioId>(SCENARIOS[0].id)
@@ -48,17 +48,19 @@ export function Form() {
 
     async function generateChecklist() {
       const response = await fetch('/api/writing-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           scenarioId,
           userContent: debouncedPrompt,
         }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
       })
 
-      const { checklist: newChecklist } = await response.json()
+      const { checklist: newChecklist } = (await response.json()) as {
+        checklist: Checklist
+      }
 
       console.log('API Response:', newChecklist)
 
@@ -69,7 +71,7 @@ export function Form() {
   }, [scenarioId, debouncedPrompt, isInteractive])
 
   return (
-    <Stack spacing={3} component="form" sx={{ mt: 4, maxWidth: 600 }}>
+    <Stack spacing={3} component="form" sx={{ maxWidth: 600, mt: 4 }}>
       <FormControl fullWidth>
         <InputLabel id="scenario-label">Scenario</InputLabel>
         <Select
@@ -101,7 +103,7 @@ export function Form() {
         direction="row"
         spacing={1}
         useFlexGap
-        sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap' }}
       >
         <Typography component="span">Focus on:</Typography>
         {checklist.map((item) => (
