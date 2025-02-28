@@ -135,5 +135,6 @@ Output:
 \`\`\`
 
 ## Output Format
+
 Return a JSON object with a single key, \`prefilledFields\`, which contains the \`goals\`, \`sessions\`, and \`speakers\` fields.
 `

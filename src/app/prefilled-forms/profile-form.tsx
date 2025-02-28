@@ -196,7 +196,7 @@ export function ProfileForm({
       </AccordionDetails>
       <AccordionActions>
         <Button variant="contained" color="primary" type="submit">
-          Start Registration
+          Start {new Date().getFullYear()} Registration
         </Button>
       </AccordionActions>
     </Accordion>

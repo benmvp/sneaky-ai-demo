@@ -20,6 +20,7 @@ type Response = z.infer<typeof contentSchema>
 export async function generateChecklist(
   scenarioId: ScenarioId,
   userContent: string,
+  existingChecklist: Checklist,
 ): Promise<Checklist> {
   const scenario = SCENARIO_LOOKUP.get(scenarioId)
 
@@ -27,8 +28,13 @@ export async function generateChecklist(
     return []
   }
 
-  const userMessage = `${scenario.prompt}\n---\n${userContent}`
-  // console.log('User message:', userMessage)
+  const userMessage = JSON.stringify({
+    checklist: existingChecklist.map((item) => item.content),
+    content: userContent,
+    instructions: scenario.prompt,
+  })
+
+  console.log('User message:', userMessage)
 
   const responseContent = await getContent<Response>({
     contentSchema,
@@ -75,10 +81,36 @@ You are a helpful AI writing assistant.
 
 The user prompt will consist of two parts:
 
-- **Instruction:** A concise phrase describing the writing task (e.g., "Summarize your recent business trip")
+- **Instructions:** A concise phrase describing the writing task (e.g., "Summarize your recent business trip")
 - **User Content:** The actual text written by the user.
+- **Topics (optional):** If specified and non-empty, the specific topics to evaluate the writing against.
 
-## Examples (for illustrative purposes only)
+## Example (for illustrative purposes only)
 
-- **Peer Review:** Key accomplishments, areas of strength, areas for improvement, teamwork and collaboration, communication skills.
+Input (User Prompt):
+\`\`\`json
+{
+    "instructions": "Please give feedback for your peer",
+    "content": "Ben has shown great improvement in his coding skills and collaboration with the team. He needs to work on his presentation skills and meeting deadlines."
+}
+\`\`\`
+
+Output:
+\`\`\`json
+{
+    "checklist": [
+      { "content": "Key accomplishments", "done": true },
+      { "content": "Areas of strength", "done": false },
+      { "content": "Areas for improvement", "done": true },
+      { "content": "Teamwork and collaboration", "done": false },
+      { "content": "Communication skills", "done": true }
+    ]
+}
+\`\`\`
+
+NOTE: If the user prompt includes a non-empty topics list, you should evaluate the content against that list and reflect it back as the \`checklist\` marking those that are done. Otherwise, generate a new checklist based on the instructions and user input.
+
+## Output Format
+
+Return a JSON object with a single key, \`checklist\`, which contains an array of objects with \`content\` and \`done\` fields.
 `

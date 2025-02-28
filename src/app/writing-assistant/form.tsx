@@ -24,7 +24,7 @@ import type { ScenarioId } from './data'
 export function Form() {
   const [scenarioId, setScenarioId] = useState<ScenarioId>(SCENARIOS[0].id)
   const [prompt, setPrompt] = useState('')
-  const debouncedPrompt = useDebounce(prompt, 1500)
+  const debouncedPrompt = useDebounce(prompt, 750)
   const [checklist, setChecklist] = useState<Checklist>([])
   const [isInteractive, setIsInteractive] = useState(false)
   const scenario = SCENARIO_LOOKUP.get(scenarioId)
@@ -33,6 +33,7 @@ export function Form() {
   const handleScenarioChange = (event: SelectChangeEvent) => {
     setPrompt('')
     setScenarioId(event.target.value as ScenarioId)
+    setChecklist([])
   }
   const handlePromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPrompt(event.target.value)
@@ -49,6 +50,7 @@ export function Form() {
     async function generateChecklist() {
       const response = await fetch('/api/writing-assistant', {
         body: JSON.stringify({
+          checklist: isInteractive ? checklist : [],
           scenarioId,
           userContent: debouncedPrompt,
         }),
@@ -62,12 +64,19 @@ export function Form() {
         checklist: Checklist
       }
 
-      console.log('API Response:', newChecklist)
+      setChecklist(
+        newChecklist.sort((a, b) => {
+          // sort by done status, then by content alphabetically
+          if (a.done === b.done) {
+            return a.content.localeCompare(b.content)
+          }
 
-      setChecklist(newChecklist)
+          return a.done ? 1 : -1
+        }),
+      )
     }
 
-    generateChecklist()
+    void generateChecklist()
   }, [scenarioId, debouncedPrompt, isInteractive])
 
   return (
@@ -81,9 +90,9 @@ export function Form() {
           label="Scenario"
           onChange={handleScenarioChange}
         >
-          {SCENARIOS.map((scenario) => (
-            <MenuItem key={scenario.id} value={scenario.id}>
-              {scenario.name}
+          {SCENARIOS.map((s) => (
+            <MenuItem key={s.id} value={s.id}>
+              {s.name}
             </MenuItem>
           ))}
         </Select>
@@ -93,7 +102,7 @@ export function Form() {
         id="prompt"
         label={scenario?.name}
         multiline
-        rows={20}
+        rows={10}
         placeholder={scenario?.prompt}
         value={prompt}
         onChange={handlePromptChange}
